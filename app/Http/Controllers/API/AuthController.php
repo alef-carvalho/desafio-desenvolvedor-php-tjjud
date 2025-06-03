@@ -20,7 +20,7 @@ class AuthController extends Controller
     }
 
     #[Post('/')]
-    public function findAll(LoginFormRequest $request)
+    public function logim(LoginFormRequest $request)
     {
         $credentials = $request->validated();
         $token = $this->service->login($credentials);
