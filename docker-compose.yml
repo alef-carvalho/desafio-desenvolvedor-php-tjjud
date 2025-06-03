@@ -1,0 +1,41 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: livraria_php
+        working_dir: /var/www
+        volumes:
+            - ./:/var/www
+        env_file:
+            - .env
+        depends_on:
+            - mysql
+        restart: unless-stopped
+
+    nginx:
+        image: nginx:alpine
+        container_name: livraria_nginx
+        volumes:
+            - ./:/var/www
+            - ./docker/config/nginx:/etc/nginx/conf.d
+        ports:
+            - "8080:80"
+        depends_on:
+            - app
+        restart: unless-stopped
+
+    mysql:
+        image: 'mysql/mysql-server:8.0'
+        ports:
+            - '3306:3306'
+        container_name: livraria_mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ROOT_HOST: '%'
+            MYSQL_DATABASE: '${DB_DATABASE}'
+            MYSQL_USER: '${DB_USERNAME}'
+            MYSQL_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ALLOW_EMPTY_PASSWORD: 1
+        volumes:
+            - './docker/volumes/mysql:/var/lib/mysql'

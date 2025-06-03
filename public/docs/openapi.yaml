@@ -1,0 +1,356 @@
+openapi: 3.0.0
+info:
+  title: Livraria API
+  version: 1.0.0
+  description: Documentação da API de Livraria
+servers:
+  - url: http://localhost/api/v1
+    description: Ambiente local
+components:
+  securitySchemes:
+    auth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    StoreAuthorRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+    UpdateAuthorRequest:
+      allOf:
+        - $ref: '#/components/schemas/StoreAuthorRequest'
+    StoreBookRequest:
+      type: object
+      required:
+        - title
+        - edition
+        - publisher
+        - published_year
+        - authors
+        - subjects
+      properties:
+        title:
+          type: string
+        edition:
+          type: integer
+        publisher:
+          type: string
+        published_year:
+          type: integer
+        authors:
+          type: array
+          items:
+            type: integer
+        subjects:
+          type: array
+          items:
+            type: integer
+    UpdateBookRequest:
+      allOf:
+        - $ref: '#/components/schemas/StoreBookRequest'
+    StoreSubjectRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+    UpdateSubjectRequest:
+      allOf:
+        - $ref: '#/components/schemas/StoreSubjectRequest'
+paths:
+  /auth:
+    post:
+      tags:
+        - Auth
+      summary: Autentica um usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Token JWT gerado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  token_type:
+                    type: string
+  /authors:
+    get:
+      tags: [Autores]
+      summary: Listagem de autores
+      security:
+        - auth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          required: false
+          description: Página atual
+        - in: query
+          name: size
+          schema:
+            type: integer
+          required: false
+          description: Quantidade por página
+      responses:
+        '200':
+          description: Listagem de autores
+    post:
+      tags: [Autores]
+      summary: Cria um novo autor
+      security:
+        - auth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreAuthorRequest'
+      responses:
+        '201':
+          description: Autor criado
+
+  /authors/{id}:
+    get:
+      tags: [Autores]
+      summary: Detalha um autor
+      security:
+        - auth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Autor
+    put:
+      tags: [Autores]
+      summary: Atualiza um autor
+      security:
+        - auth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAuthorRequest'
+      responses:
+        '200':
+          description: Autor atualizado
+    delete:
+      tags: [Autores]
+      summary: Deleta um autor
+      security:
+        - auth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Deletado com sucesso
+  /books:
+
+    get:
+      tags: [Livros]
+      summary: Listagem de livros paginados
+      security:
+        - auth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          required: false
+          description: Página atual
+        - in: query
+          name: size
+          schema:
+            type: integer
+          required: false
+          description: Quantidade por página
+      responses:
+        '200':
+          description: Listagem de livros
+    post:
+      tags: [Livros]
+      summary: Cria um novo livro
+      security:
+        - auth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreBookRequest'
+      responses:
+        '201':
+          description: Livro criado
+
+  /books/{id}:
+    get:
+      tags: [Livros]
+      summary: Detalha um livro
+      security:
+        - auth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Livro
+    put:
+      tags: [Livros]
+      summary: Atualiza um livro
+      security:
+        - auth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBookRequest'
+      responses:
+        '200':
+          description: Livro atualizado
+    delete:
+      tags: [Livros]
+      summary: Deleta um livro
+      security:
+        - auth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Deletado com sucesso
+
+  /subjects:
+    get:
+      tags: [Assuntos]
+      summary: Listagem de assuntos paginados
+      security:
+        - auth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          required: false
+          description: Página atual
+        - in: query
+          name: size
+          schema:
+            type: integer
+          required: false
+          description: Quantidade por página
+      responses:
+        '200':
+          description: Listagem de assuntos
+    post:
+      tags: [Assuntos]
+      summary: Cria um novo assunto
+      security:
+        - auth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreSubjectRequest'
+      responses:
+        '201':
+          description: Assunto criado
+  /subjects/{id}:
+    get:
+      tags: [Assuntos]
+      summary: Detalha um assunto
+      security:
+        - auth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Assunto
+    put:
+      tags: [Assuntos]
+      summary: Atualiza um assunto
+      security:
+        - auth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSubjectRequest'
+      responses:
+        '200':
+          description: Assunto atualizado
+    delete:
+      tags: [Assuntos]
+      summary: Deleta um assunto
+      security:
+        - auth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Deletado com sucesso
